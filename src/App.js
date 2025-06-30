@@ -21,9 +21,11 @@ function App() {
       });
   }, []);
 
-  const filteredCountries = countries.filter((country) =>
+const filteredCountries = countries.filter(
+  (country) =>
+    country.name &&
     country.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+);
 
   return (
     <div className="appContainer">
