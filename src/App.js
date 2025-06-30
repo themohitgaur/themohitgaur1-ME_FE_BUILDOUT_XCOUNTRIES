@@ -1,62 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { Grid, Card, CardContent, Typography, CircularProgress } from '@mui/material';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Fetch country data using fetch API
-    fetch('https://xcountries-backend.azurewebsites.net/all')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    fetch("https://countries-search-data-prod-812920491762.asia-south1.run.app/countries")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
         }
-        return response.json();
+        return res.json();
       })
       .then((data) => {
         setCountries(data);
-        setLoading(false);
       })
       .catch((err) => {
-        console.error("Error fetching data: ", err);
-        setError(err);
-        setLoading(false);
+        console.error("Error fetching country data:", err);
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <Typography variant="h6">Failed to load country data.</Typography>;
-  }
+  const filteredCountries = countries.filter((country) =>
+    country.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <Grid container spacing={2}>
-      {countries.map((country) => (
-        <Grid item xs={12} sm={8} md={6} lg={2} key={country.name}>
-          <Card>
-            <CardContent>
-              <img
-                src={country.flag}
-                alt={`${country.name} flag`}
-                style={{ width: '100px', height: 'auto' }}
-                onError={(e) => { e.target.onerror = null; e.target.src = 'path/to/placeholder-image.png'; }}
-              />
-              <Typography variant="h6">{country.name}</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <div className="appContainer">
+      <input
+        type="text"
+        placeholder="Search country..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="searchInput"
+      />
+      <div className="countryGrid">
+        {filteredCountries.length > 0 ? (
+          filteredCountries.map((country) => (
+            <div key={country.name} className="countryCard">
+              <img src={country.flag} alt={`${country.name} flag`} />
+              <p>{country.name}</p>
+            </div>
+          ))
+        ) : (
+          <p>No countries found.</p>
+        )}
+      </div>
+    </div>
   );
 }
 
