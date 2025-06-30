@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
@@ -13,19 +13,17 @@ function App() {
         }
         return res.json();
       })
-      .then((data) => {
-        setCountries(data);
-      })
+      .then((data) => setCountries(data))
       .catch((err) => {
-        console.error("Error fetching country data:", err);
+        console.error("Error fetching data:", err);
       });
   }, []);
 
-const filteredCountries = countries.filter(
-  (country) =>
-    country.name &&
-    country.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
+  const filteredCountries = countries.filter(
+    (country) =>
+      country.common &&
+      country.common.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="appContainer">
@@ -39,9 +37,16 @@ const filteredCountries = countries.filter(
       <div className="countryGrid">
         {filteredCountries.length > 0 ? (
           filteredCountries.map((country) => (
-            <div key={country.name} className="countryCard">
-              <img src={country.flag} alt={`${country.name} flag`} />
-              <p>{country.name}</p>
+            <div key={country.common} className="countryCard">
+              <img
+                src={country.png}
+                alt={`${country.common} flag`}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://via.placeholder.com/150";
+                }}
+              />
+              <p>{country.common}</p>
             </div>
           ))
         ) : (
